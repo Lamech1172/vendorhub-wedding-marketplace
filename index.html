@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VendorHub — Wedding Vendor Marketplace</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#home" class="logo">💜 Vendor<span>Hub</span></a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#categories">Categories</a></li>
+        <li><a href="#vendors">Vendors</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><button class="btn-outline-sm" id="darkModeBtn" title="Toggle Dark Mode">🌙</button></li>
+        <li><button class="btn-primary-sm" id="authNavBtn" onclick="openAuthModal()">Login / Register</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header id="home" class="hero">
+    <div class="container hero-content">
+      <span class="pill-badge">India's Trusted Wedding Marketplace</span>
+      <h1>Discover & Book Your Dream Wedding Vendors</h1>
+      <p>Compare verified venues, candid photographers, royal caterers, florists, and bridal artists all in one place.</p>
+      <div class="hero-search">
+        <input type="text" id="heroSearchInput" placeholder="Search venues, photographers, cities (e.g., Madurai, Chennai)..." />
+        <button class="btn-primary" onclick="triggerHeroSearch()">Search Vendors</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Vendor Categories -->
+  <section id="categories" class="section container">
+    <div class="section-header">
+      <h2>Browse by Wedding Category</h2>
+      <p>Click any category to filter matching wedding professionals</p>
+    </div>
+    <div class="category-grid" id="categoryGrid"></div>
+  </section>
+
+  <!-- Vendor Listing & Multi-Filter Section -->
+  <section id="vendors" class="section container">
+    <div class="section-header">
+      <h2>Featured Wedding Vendors</h2>
+      <p>Filter by category, city, budget, and customer ratings</p>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Search vendor name..." oninput="applyFilters()" />
+      <select id="categoryFilter" onchange="applyFilters()">
+        <option value="All">All Categories</option>
+        <option value="Venues">Venues</option>
+        <option value="Photographers">Photographers</option>
+        <option value="Caterers">Caterers</option>
+        <option value="Florists">Florists</option>
+        <option value="Makeup & Styling">Makeup & Styling</option>
+        <option value="DJs">DJs</option>
+        <option value="Planners">Planners</option>
+      </select>
+      <select id="locationFilter" onchange="applyFilters()">
+        <option value="All">All Cities</option>
+        <option value="Madurai">Madurai</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Bengaluru">Bengaluru</option>
+      </select>
+      <select id="priceFilter" onchange="applyFilters()">
+        <option value="9999999">Any Budget</option>
+        <option value="50000">Up to ₹50,000</option>
+        <option value="150000">Up to ₹1,50,000</option>
+        <option value="300000">Up to ₹3,00,000</option>
+      </select>
+      <select id="ratingFilter" onchange="applyFilters()">
+        <option value="0">Any Rating</option>
+        <option value="4.5">4.5★ & Above</option>
+        <option value="4.8">4.8★ & Above</option>
+      </select>
+    </div>
+
+    <div class="vendor-grid" id="vendorGrid"></div>
+  </section>
+
+  <!-- User & Vendor Dashboards -->
+  <section id="dashboard" class="section container">
+    <div class="section-header">
+      <h2>Marketplace Dashboards</h2>
+      <p>Switch between Couple (User) View and Service Provider (Vendor) View</p>
+    </div>
+
+    <div class="dashboard-tabs">
+      <button class="dash-tab active" id="userTabBtn" onclick="switchDashboard('user')">👰 User Dashboard</button>
+      <button class="dash-tab" id="vendorTabBtn" onclick="switchDashboard('vendor')">🏪 Vendor Dashboard</button>
+    </div>
+
+    <!-- User Dashboard View -->
+    <div id="userDashboardPanel" class="dash-panel active">
+      <div class="stats-row">
+        <div class="stat-card">
+          <h3 id="statUserBookings">0</h3>
+          <p>Active Bookings</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="statUserFavorites">0</h3>
+          <p>Saved Favorites</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="statTotalSpend">₹0</h3>
+          <p>Estimated Budget</p>
+        </div>
+      </div>
+
+      <div class="dash-two-col">
+        <div class="card-box">
+          <h3>📅 My Bookings</h3>
+          <div id="userBookingsList"></div>
+        </div>
+        <div class="card-box">
+          <h3>❤️ Saved Wishlist</h3>
+          <div id="userFavoritesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor Dashboard View -->
+    <div id="vendorDashboardPanel" class="dash-panel">
+      <div class="stats-row">
+        <div class="stat-card">
+          <h3 id="statTotalVendors">0</h3>
+          <p>Listed Vendors</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="statIncomingBookings">0</h3>
+          <p>Client Booking Requests</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="statTotalReviews">0</h3>
+          <p>Verified Reviews</p>
+        </div>
+      </div>
+
+      <div class="dash-two-col">
+        <div class="card-box">
+          <h3>➕ Add New Vendor Listing</h3>
+          <form id="addVendorForm" onsubmit="handleAddVendor(event)">
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" id="newVendorName" placeholder="e.g., Royal Lotus Mandap" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Category</label>
+                <select id="newVendorCategory" required>
+                  <option value="Venues">Venues</option>
+                  <option value="Photographers">Photographers</option>
+                  <option value="Caterers">Caterers</option>
+                  <option value="Florists">Florists</option>
+                  <option value="Makeup & Styling">Makeup & Styling</option>
+                  <option value="DJs">DJs</option>
+                  <option value="Planners">Planners</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="newVendorLocation" placeholder="e.g., Madurai" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Starting Price (₹)</label>
+                <input type="number" id="newVendorPrice" placeholder="75000" min="1000" required />
+              </div>
+              <div class="form-group">
+                <label>Services (Comma-separated)</label>
+                <input type="text" id="newVendorServices" placeholder="Reception, Sangeet, Decor" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="newVendorDesc" rows="2" placeholder="Highlight specialties and capacity..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary full-width">Publish Vendor Listing</button>
+          </form>
+        </div>
+
+        <div class="card-box">
+          <h3>📋 Manage Incoming Client Bookings</h3>
+          <div id="vendorBookingsManageList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3>💜 VendorHub</h3>
+        <p>Connecting couples with verified wedding venues, photographers, caterers, and decorators.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <p><a href="#home">Home</a> • <a href="#categories">Categories</a> • <a href="#vendors">Vendors</a> • <a href="#dashboard">Dashboard</a></p>
+      </div>
+      <div>
+        <h4>Internship Task</h4>
+        <p>Task ID: WD-MAT-005 | Data Alcott Systems</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Modal (Vendor Detail / Booking / Auth) -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
